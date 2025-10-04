@@ -1,0 +1,12 @@
+<settings>
+    <setting propertyKey="@Properties.ColorTheme" title="@Strings.ColorThemeTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.ColorMatrix</listEntry>
+            <listEntry value="1">@Strings.ColorCyan</listEntry>
+            <listEntry value="2">@Strings.ColorAmber</listEntry>
+            <listEntry value="3">@Strings.ColorPurple</listEntry>
+            <listEntry value="4">@Strings.ColorRed</listEntry>
+            <listEntry value="5">@Strings.ColorBlue</listEntry>
+        </settingConfig>
+    </setting>
+</settings>
