@@ -35,6 +35,9 @@ class RetroDigitalView extends WatchUi.WatchFace {
     private var _centerY;
     private var _radius;
 
+        // New variable for cascade effect toggle
+    private var _cascadeEnabled;
+
 
 
 
@@ -65,7 +68,12 @@ class RetroDigitalView extends WatchUi.WatchFace {
         if (_distanceUnit == null) {
             _distanceUnit = 0; // Default to miles
         }
-    }
+
+        _cascadeEnabled = Application.Properties.getValue("CascadeEffect");
+         if (_cascadeEnabled == null) {
+         _cascadeEnabled = true; // Default to enabled
+        }
+}
 
 
     // Load color theme based on user settings
@@ -198,7 +206,7 @@ class RetroDigitalView extends WatchUi.WatchFace {
         dc.clear();
         
         // Draw the retro digital interface
-        if (_isAwake) {
+        if (_isAwake && _cascadeEnabled  == 0) {
             drawMatrixRain(dc);  // Only draw rain when awake
         }
         drawCurvedGauges(dc);     // Draw the new curved gauges
@@ -393,7 +401,7 @@ class RetroDigitalView extends WatchUi.WatchFace {
         // Draw AM/PM if needed - small indicator positioned upper right
         if (!is24Hour && amPm.length() > 0) {
             dc.setColor(_darkGreen, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(centerX * 1.55, centerY * 0.75, Graphics.FONT_TINY, amPm,
+            dc.drawText(centerX * 1.50, centerY * 0.75, Graphics.FONT_TINY, amPm,
                        Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
         }
     }

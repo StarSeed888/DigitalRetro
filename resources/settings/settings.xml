@@ -29,6 +29,11 @@
         </settingConfig>
     </setting>
 
-
+ <setting propertyKey="@Properties.CascadeEffect" title="@Strings.CascadeEffectTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.CascadeEnabled</listEntry>
+            <listEntry value="1">@Strings.CascadeDisabled</listEntry>
+        </settingConfig>
+    </setting>
 
 </settings>

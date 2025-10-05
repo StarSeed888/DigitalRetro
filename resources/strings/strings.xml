@@ -18,4 +18,7 @@
     <string id="DistanceUnitTitle">Distance Unit</string>
     <string id="Miles">Miles</string>
     <string id="Kilometers">Kilometers</string>
+    <string id="CascadeEffectTitle">Matrix Rain Effect</string>
+    <string id="CascadeEnabled">Enabled</string>
+    <string id="CascadeDisabled">Disabled</string>
 </strings>
