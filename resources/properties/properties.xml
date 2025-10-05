@@ -1,3 +1,6 @@
 <properties>
     <property id="ColorTheme" type="number">0</property>
+    <property id="CalorieGoal" type="number">2000</property>
+    <property id="DistanceGoal" type="number">5</property>
+    <property id="DistanceUnit" type="number">0</property>
 </properties>

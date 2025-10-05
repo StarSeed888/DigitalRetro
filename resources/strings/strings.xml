@@ -1,10 +1,21 @@
 <strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+     <string id="AppName">Retro Cascade</string>
     <string id="AppName">Retro Cascade</string>
     <string id="ColorThemeTitle">Color Theme</string>
-    <string id="ColorMatrix">Matrix Green</string>
-    <string id="ColorCyan">Retro Cyan</string>
-    <string id="ColorAmber">Retro Amber</string>
-    <string id="ColorPurple">Retro Purple</string>
-    <string id="ColorRed">Retro Red</string>
-    <string id="ColorBlue">Retro Blue</string>
+    <string id="MatrixGreen">Matrix Green</string>
+    <string id="RetroCyan">Retro Cyan</string>
+    <string id="RetroAmber">Retro Amber</string>
+    <string id="RetroPurple">Retro Purple</string>
+    <string id="RetroRed">Retro Red</string>
+    <string id="RetroBlue">Retro Blue</string>
+    <string id="RetroOrange">Retro Orange</string>
+    <string id="RetroPink">Retro Pink</string>
+    <string id="RetroYellow">Retro Yellow</string>
+    <string id="RetroWhite">Retro White</string>
+    
+    <string id="CalorieGoalTitle">Daily Calorie Goal</string>
+    <string id="DistanceGoalTitle">Daily Distance Goal</string>
+    <string id="DistanceUnitTitle">Distance Unit</string>
+    <string id="Miles">Miles</string>
+    <string id="Kilometers">Kilometers</string>
 </strings>

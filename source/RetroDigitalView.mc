@@ -5,6 +5,8 @@ import Toybox.WatchUi;
 import Toybox.ActivityMonitor;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
+import Toybox.Application;
+import Toybox.Math;
 
 class RetroDigitalView extends WatchUi.WatchFace {
     
@@ -25,18 +27,49 @@ class RetroDigitalView extends WatchUi.WatchFace {
     private var _maxCharsPerColumn;
     private var _isAwake;
 
+    // New variables for curved gauges
+    private var _calorieGoal;
+    private var _distanceGoal;
+    private var _distanceUnit; // 0 = miles, 1 = kilometers
+    private var _centerX;
+    private var _centerY;
+    private var _radius;
+
+
+
+
     function initialize() {
         WatchFace.initialize();
         
         // Load user's color theme preference and set colors
         loadColorTheme();
         
+        // Load goal settings
+        loadGoalSettings();
         // Start in awake state
         _isAwake = true;
     }
 
+ function loadGoalSettings() as Void {
+        _calorieGoal = Application.Properties.getValue("CalorieGoal");
+        if (_calorieGoal == null) {
+            _calorieGoal = 2000; // Default calorie goal
+        }
+        
+        _distanceGoal = Application.Properties.getValue("DistanceGoal");
+        if (_distanceGoal == null) {
+            _distanceGoal = 5; // Default distance goal (5 miles/km)
+        }
+        
+        _distanceUnit = Application.Properties.getValue("DistanceUnit");
+        if (_distanceUnit == null) {
+            _distanceUnit = 0; // Default to miles
+        }
+    }
+
+
     // Load color theme based on user settings
-    function loadColorTheme() as Void {
+       function loadColorTheme() as Void {
         var colorTheme = Application.Properties.getValue("ColorTheme");
         if (colorTheme == null) {
             colorTheme = 0; // Default to Matrix Green
@@ -45,54 +78,81 @@ class RetroDigitalView extends WatchUi.WatchFace {
         // Set colors based on selected theme
         switch (colorTheme) {
             case 0: // Matrix Green
-                _matrixGreen = 0x00FF41;   // Bright matrix green
+                _matrixGreen = 0x00FF41;   // Standard matrix green
                 _darkGreen = 0x008F11;     // Dark green for outlines
-                _brightGreen = 0x41FF00;   // Bright green for highlights
+                _brightGreen = 0x80FF80;   // Much brighter green for highlights
                 break;
             case 1: // Retro Cyan
-                _matrixGreen = 0x00FFFF;   // Bright cyan
+                _matrixGreen = 0x00FFFF;   // Standard cyan
                 _darkGreen = 0x008F8F;     // Dark cyan
-                _brightGreen = 0x40FFFF;   // Bright cyan highlight
+                _brightGreen = 0x80FFFF;   // Much brighter cyan highlight
                 break;
             case 2: // Retro Amber
-                _matrixGreen = 0xFFB000;   // Bright amber
+                _matrixGreen = 0xFFB000;   // Standard amber
                 _darkGreen = 0x8F6000;     // Dark amber
-                _brightGreen = 0xFFD040;   // Bright amber highlight
+                _brightGreen = 0xFFE080;   // Much brighter amber highlight
                 break;
             case 3: // Retro Purple
-                _matrixGreen = 0xBF40FF;   // Bright purple
+                _matrixGreen = 0xBF40FF;   // Standard purple
                 _darkGreen = 0x6F258F;     // Dark purple
-                _brightGreen = 0xDF60FF;   // Bright purple highlight
+                _brightGreen = 0xE080FF;   // Much brighter purple highlight
                 break;
             case 4: // Retro Red
-                _matrixGreen = 0xFF4040;   // Bright red
+                _matrixGreen = 0xFF4040;   // Standard red
                 _darkGreen = 0x8F2525;     // Dark red
-                _brightGreen = 0xFF6060;   // Bright red highlight
+                _brightGreen = 0xFF8080;   // Much brighter red highlight
                 break;
             case 5: // Retro Blue
-                _matrixGreen = 0x4080FF;   // Bright blue
+                _matrixGreen = 0x4080FF;   // Standard blue
                 _darkGreen = 0x25508F;     // Dark blue
-                _brightGreen = 0x60A0FF;   // Bright blue highlight
+                _brightGreen = 0x80B0FF;   // Much brighter blue highlight
+                break;
+            case 6: // Retro Orange (Commodore 64 style)
+                _matrixGreen = 0xFF8000;   // Standard orange
+                _darkGreen = 0x8F4000;     // Dark orange
+                _brightGreen = 0xFFB050;   // Bright orange highlight
+                break;
+            case 7: // Retro Pink (Synthwave)
+                _matrixGreen = 0xFF40A0;   // Standard hot pink
+                _darkGreen = 0x8F2560;     // Dark pink
+                _brightGreen = 0xFF80C0;   // Bright pink highlight
+                break;
+            case 8: // Retro Yellow (Amber alternative)
+                _matrixGreen = 0xFFFF00;   // Standard yellow
+                _darkGreen = 0x8F8F00;     // Dark yellow
+                _brightGreen = 0xFFFF80;   // Bright yellow highlight
+                break;
+            case 9: // Retro White (Classic terminal)
+                _matrixGreen = 0xE0E0E0;   // Standard light gray/white
+                _darkGreen = 0x808080;     // Dark gray
+                _brightGreen = 0xFFFFFF;   // Pure white highlight
                 break;
             default: // Fallback to Matrix Green
                 _matrixGreen = 0x00FF41;
                 _darkGreen = 0x008F11;
-                _brightGreen = 0x41FF00;
+                _brightGreen = 0x80FF80;
         }
         
         _black = 0x000000; // Black background (always the same)
     }
-
     // Handle settings changes
     function onSettingsChanged() as Void {
         loadColorTheme(); // Reload colors when settings change
+        loadGoalSettings(); // Reload goals when settings change
     }
 
     // Load your resources here
     function onLayout(dc as Dc) as Void {
         _screenWidth = dc.getWidth();
         _screenHeight = dc.getHeight();
+        // Calculate center and radius for curved gauges using proportions
+        _centerX = (_screenWidth * 0.5).toNumber();
+        _centerY = (_screenHeight * 0.5).toNumber();
         
+        // Radius is 35% of the smaller screen dimension
+        var minDimension = _screenWidth < _screenHeight ? _screenWidth : _screenHeight;
+        _radius = (minDimension * 0.45).toNumber();
+
         // Initialize matrix rain effect
         initializeMatrixRain();
     }
@@ -141,11 +201,110 @@ class RetroDigitalView extends WatchUi.WatchFace {
         if (_isAwake) {
             drawMatrixRain(dc);  // Only draw rain when awake
         }
+        drawCurvedGauges(dc);     // Draw the new curved gauges
         drawDigitalTime(dc);
         drawStatusBars(dc);
         drawDataElements(dc);
     }
     
+    function calculateDistance(steps as Number) as Float {
+        // Average stride length: 2.5 feet for men, 2.2 feet for women
+        // Using 2.35 feet (0.716 meters) as a reasonable average
+        var strideLength = 2.35; // feet
+        var totalFeet = steps * strideLength;
+        
+        if (_distanceUnit == 0) {
+            // Convert to miles (5280 feet per mile)
+            return totalFeet / 5280.0;
+        } else {
+            // Convert to kilometers (feet to meters to kilometers)
+            var totalMeters = totalFeet * 0.3048; // feet to meters
+            return totalMeters / 1000.0; // meters to kilometers
+        }
+    }
+
+ // Draw curved gauges for calories and distance using retro characters
+   function drawCurvedGauges(dc as Dc) as Void {
+        var activityInfo = ActivityMonitor.getInfo();
+        if (activityInfo == null) {
+            return;
+        }
+        
+        // Calorie gauge (left side - from 135° to 225°)
+        if (activityInfo has :calories && activityInfo.calories != null) {
+            var calories = activityInfo.calories;
+            var calorieProgress = calories.toFloat() / _calorieGoal.toFloat();
+            if (calorieProgress > 1.0) { calorieProgress = 1.0; }
+            
+            var calorieColor = calorieProgress >= 1.0 ? _brightGreen : _matrixGreen;
+            // Make label color consistent with STP - use main color normally, bright when goal reached
+            var calorieLabelColor = calorieProgress >= 1.0 ? _brightGreen : _matrixGreen;
+            drawRetroGauge(dc, 135, 90, calorieProgress, calorieColor, "CAL", calorieLabelColor);
+        }
+        
+        // Distance gauge (right side - from 315° to 45°)
+        if (activityInfo has :steps && activityInfo.steps != null) {
+            var steps = activityInfo.steps;
+            var actualDistance = calculateDistance(steps);
+            var distanceProgress = actualDistance / _distanceGoal.toFloat();
+            if (distanceProgress > 1.0) { distanceProgress = 1.0; }
+            
+            var distanceColor = distanceProgress >= 1.0 ? _brightGreen : _matrixGreen;
+            // Make label color consistent with STP - use main color normally, bright when goal reached
+            var distanceLabelColor = distanceProgress >= 1.0 ? _brightGreen : _matrixGreen;
+            var distanceLabel = _distanceUnit == 0 ? "MI" : "KM";
+            drawRetroGauge(dc, 315, 90, distanceProgress, distanceColor, distanceLabel, distanceLabelColor);
+        }
+    }
+
+
+
+    function drawRetroGauge(dc as Dc, startAngle as Number, arcLength as Number, 
+                           progress as Float, color as Number, label as String, labelColor as Number) as Void {
+        
+        var numSegments = 10; // Number of character segments in the gauge
+        var angleStep = arcLength / numSegments;
+        
+        // Draw each segment of the gauge
+        for (var i = 0; i < numSegments; i++) {
+            var angle = startAngle + (i * angleStep);
+            
+            // Calculate position using proportional radius (right against the edge)
+            var x = _centerX + (_radius * Math.cos(Math.toRadians(angle)));
+            var y = _centerY + (_radius * Math.sin(Math.toRadians(angle)));
+            
+            // Determine if this segment should be filled
+            var segmentProgress = (i + 1).toFloat() / numSegments.toFloat();
+            var character = "";
+            var segmentColor = _darkGreen;
+            
+            if (segmentProgress <= progress) {
+                character = "|";  // Filled segment - same as battery/steps
+                segmentColor = color;
+            } else {
+                character = "-";  // Empty segment - using dash for visibility
+                segmentColor = _darkGreen;
+            }
+            
+            // Draw the character
+            dc.setColor(segmentColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(x.toNumber(), y.toNumber(), Graphics.FONT_XTINY, character, 
+                       Graphics.TEXT_JUSTIFY_CENTER);
+        }
+        
+        // Draw label using the passed labelColor (now matches STP behavior)
+        var labelAngle = startAngle + (arcLength / 2); // Center the label
+        var labelRadius = (_radius * 0.85).toNumber(); // Inside the arc
+        var labelX = _centerX + (labelRadius * Math.cos(Math.toRadians(labelAngle)));
+        var labelY = _centerY + (labelRadius * Math.sin(Math.toRadians(labelAngle)));
+        
+        dc.setColor(labelColor, Graphics.COLOR_TRANSPARENT);  // Use the dynamic label color
+        dc.drawText(labelX.toNumber(), labelY.toNumber(), Graphics.FONT_XTINY, label, 
+                   Graphics.TEXT_JUSTIFY_CENTER);
+    }
+
+
+
     // Draw Matrix-style falling rain effect with multiple character streams
     function drawMatrixRain(dc as Dc) as Void {
         if (_rainChars == null) {
@@ -172,8 +331,8 @@ class RetroDigitalView extends WatchUi.WatchFace {
                     dc.drawText(x, y, Graphics.FONT_TINY, _rainChars[charIndex], Graphics.TEXT_JUSTIFY_CENTER);
                 }
                 
-                // Update position - faster movement
-                _rainPositions[charIndex] = _rainPositions[charIndex] + 3;
+                // Update position - much faster movement for visibility during short wake periods
+                _rainPositions[charIndex] = _rainPositions[charIndex] + 12;
             }
             
             // Reset stream when lead character falls off screen
@@ -255,6 +414,20 @@ class RetroDigitalView extends WatchUi.WatchFace {
             } 
         }
         batteryString += "]";
+
+     // Change battery color based on charge level
+        var batteryColor;
+        if (battery >= 60) {
+            batteryColor = _matrixGreen;    // High battery - normal theme color
+        } else if (battery >= 30) {
+            batteryColor = _brightGreen;    // Medium battery - bright color (warning)
+        } else {
+            batteryColor = 0xFF0000;        // Low battery - red (critical warning)
+        }
+        
+        dc.setColor(batteryColor, Graphics.COLOR_TRANSPARENT);
+
+
         // Position battery at upper 10% of screen
         var batteryY = (_screenHeight * 0.10).toNumber();
         dc.drawText((_screenWidth / 2).toNumber(), batteryY, Graphics.FONT_XTINY, batteryString, Graphics.TEXT_JUSTIFY_CENTER);
@@ -276,6 +449,12 @@ class RetroDigitalView extends WatchUi.WatchFace {
                 }
             }
             stepString += "]";
+
+            // Change color based on whether step goal is reached
+            var stepProgress = steps.toFloat() / stepGoal.toFloat();
+            var stepColor = stepProgress >= 1.0 ? _brightGreen : _matrixGreen;
+            dc.setColor(stepColor, Graphics.COLOR_TRANSPARENT);
+
             // Position steps at lower 15% of screen (85% down from top)
             var stepsY = (_screenHeight * 0.75).toNumber();
             dc.drawText((_screenWidth / 2).toNumber(), stepsY, Graphics.FONT_XTINY, stepString, Graphics.TEXT_JUSTIFY_CENTER);
@@ -301,7 +480,7 @@ class RetroDigitalView extends WatchUi.WatchFace {
         var settings = System.getDeviceSettings();
         var connectionString = settings.phoneConnected ? ">> CONN:ON <<" : ">> CONN:OFF <<";
         
-        // Display connection status at header position (25% from top)
+        // Display connection status at header position (30% from top)
         dc.setColor(_brightGreen, Graphics.COLOR_TRANSPARENT);
         var headerY = (_screenHeight * 0.30).toNumber();
         dc.drawText((_screenWidth / 2).toNumber(), headerY, Graphics.FONT_XTINY, connectionString, Graphics.TEXT_JUSTIFY_CENTER);
@@ -352,10 +531,7 @@ class RetroDigitalView extends WatchUi.WatchFace {
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() as Void {
         _isAwake = true;
-        // Reinitialize rain positions when waking up
-        if (_rainChars != null) {
-            initializeMatrixRain();
-        }
+        // Don't reinitialize - just resume where we left off for immediate visibility
     }
 
     // Terminate any active timers and prepare for slow updates.

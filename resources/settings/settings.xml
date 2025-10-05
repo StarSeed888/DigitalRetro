@@ -1,12 +1,34 @@
 <settings>
     <setting propertyKey="@Properties.ColorTheme" title="@Strings.ColorThemeTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ColorMatrix</listEntry>
-            <listEntry value="1">@Strings.ColorCyan</listEntry>
-            <listEntry value="2">@Strings.ColorAmber</listEntry>
-            <listEntry value="3">@Strings.ColorPurple</listEntry>
-            <listEntry value="4">@Strings.ColorRed</listEntry>
-            <listEntry value="5">@Strings.ColorBlue</listEntry>
+            <listEntry value="0">@Strings.MatrixGreen</listEntry>
+            <listEntry value="1">@Strings.RetroCyan</listEntry>
+            <listEntry value="2">@Strings.RetroAmber</listEntry>
+            <listEntry value="3">@Strings.RetroPurple</listEntry>
+            <listEntry value="4">@Strings.RetroRed</listEntry>
+            <listEntry value="5">@Strings.RetroBlue</listEntry>
+            <listEntry value="6">@Strings.RetroOrange</listEntry>
+            <listEntry value="7">@Strings.RetroPink</listEntry>
+            <listEntry value="8">@Strings.RetroYellow</listEntry>
+            <listEntry value="9">@Strings.RetroWhite</listEntry>
         </settingConfig>
     </setting>
+
+ <setting propertyKey="@Properties.CalorieGoal" title="@Strings.CalorieGoalTitle">
+        <settingConfig type="numeric" min="500" max="5000" />
+    </setting>
+    
+    <setting propertyKey="@Properties.DistanceGoal" title="@Strings.DistanceGoalTitle">
+        <settingConfig type="numeric" min="1" max="50" />
+    </setting>
+    
+    <setting propertyKey="@Properties.DistanceUnit" title="@Strings.DistanceUnitTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Miles</listEntry>
+            <listEntry value="1">@Strings.Kilometers</listEntry>
+        </settingConfig>
+    </setting>
+
+
+
 </settings>
