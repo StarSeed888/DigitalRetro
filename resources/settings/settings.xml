@@ -31,8 +31,8 @@
 
  <setting propertyKey="@Properties.CascadeEffect" title="@Strings.CascadeEffectTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.CascadeEnabled</listEntry>
-            <listEntry value="1">@Strings.CascadeDisabled</listEntry>
+            <listEntry value="0">@Strings.CascadeDisabled</listEntry>
+            <listEntry value="1">@Strings.CascadeEnabled</listEntry>
         </settingConfig>
     </setting>
 

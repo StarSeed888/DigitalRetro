@@ -3,5 +3,5 @@
     <property id="CalorieGoal" type="number">2000</property>
     <property id="DistanceGoal" type="number">5</property>
     <property id="DistanceUnit" type="number">0</property>
-    <property id="CascadeEffect" type="number">1</property>
+    <property id="CascadeEffect" type="number">0</property>
 </properties>

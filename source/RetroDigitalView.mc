@@ -35,6 +35,8 @@ class RetroDigitalView extends WatchUi.WatchFace {
     private var _centerY;
     private var _radius;
 
+    private var _settingsPollCounter;
+
         // New variable for cascade effect toggle
     private var _cascadeEnabled;
 
@@ -51,29 +53,70 @@ class RetroDigitalView extends WatchUi.WatchFace {
         loadGoalSettings();
         // Start in awake state
         _isAwake = true;
+
+     // settings poll counter
+        _settingsPollCounter = 0;
+
     }
 
- function loadGoalSettings() as Void {
-        _calorieGoal = Application.Properties.getValue("CalorieGoal");
-        if (_calorieGoal == null) {
-            _calorieGoal = 2000; // Default calorie goal
-        }
-        
-        _distanceGoal = Application.Properties.getValue("DistanceGoal");
-        if (_distanceGoal == null) {
-            _distanceGoal = 5; // Default distance goal (5 miles/km)
-        }
-        
-        _distanceUnit = Application.Properties.getValue("DistanceUnit");
-        if (_distanceUnit == null) {
-            _distanceUnit = 0; // Default to miles
-        }
+// ...existing code...
+// ...existing code...
+function loadGoalSettings() as Void {
+    var v;
 
-        _cascadeEnabled = Application.Properties.getValue("CascadeEffect");
-         if (_cascadeEnabled == null) {
-         _cascadeEnabled = true; // Default to enabled
+    // Calorie goal (default 2000)
+    _calorieGoal = 2000;
+    v = Application.Properties.getValue("CalorieGoal");
+    if (v != null) {
+        try {
+            _calorieGoal = v.toNumber();
+        } catch (e) {
+            try { _calorieGoal = v.toString().toNumber(); } catch (e2) { _calorieGoal = 2000; }
         }
+        if (_calorieGoal == null || _calorieGoal <= 0) { _calorieGoal = 2000; }
+    }
+
+    // Distance goal (default 5)
+    _distanceGoal = 5;
+    v = Application.Properties.getValue("DistanceGoal");
+    if (v != null) {
+        try {
+            _distanceGoal = v.toNumber();
+        } catch (e) {
+            try { _distanceGoal = v.toString().toNumber(); } catch (e2) { _distanceGoal = 5; }
+        }
+        if (_distanceGoal == null || _distanceGoal <= 0) { _distanceGoal = 5; }
+    }
+
+    // Distance unit (0 = miles, 1 = km) - accept boolean or number/string
+    _distanceUnit = 0;
+    v = Application.Properties.getValue("DistanceUnit");
+    if (v != null) {
+        if (v == true || v == false) {
+            _distanceUnit = v ? 1 : 0;
+        } else {
+            try { _distanceUnit = v.toNumber(); } catch (e) {
+                try { _distanceUnit = v.toString().toNumber(); } catch (e2) { _distanceUnit = 0; }
+            }
+            if (_distanceUnit == null) { _distanceUnit = 0; }
+        }
+    }
+
+    // Cascade effect flag (normalize to list index: 0 = enabled, 1 = disabled)
+    _cascadeEnabled = 0;
+    v = Application.Properties.getValue("CascadeEffect");
+    if (v != null) {
+        if (v == true || v == false) {
+            _cascadeEnabled = v ? 0 : 1;
+        } else {
+            try { _cascadeEnabled = v.toNumber(); } catch (e) {
+                try { _cascadeEnabled = v.toString().toNumber(); } catch (e2) { _cascadeEnabled = 0; }
+            }
+            if (_cascadeEnabled == null) { _cascadeEnabled = 0; }
+        }
+    }
 }
+
 
 
     // Load color theme based on user settings
@@ -197,10 +240,32 @@ class RetroDigitalView extends WatchUi.WatchFace {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() as Void {
+        // Ensure theme and settings are current when view is shown
+    loadColorTheme();
+    loadGoalSettings();
+
+    // reset poll counter so we pick up changes predictably
+    _settingsPollCounter = 0;
+
+    // initialize rain only if layout ran and we have dimensions
+    if (_screenWidth != null && _screenWidth > 0) {
+        initializeMatrixRain();
+    }
+
+    // force an immediate redraw with new settings
+    WatchUi.requestUpdate();
+
     }
 
     // Update the view
     function onUpdate(dc as Dc) as Void {
+
+        // Increment settings poll counter
+         _settingsPollCounter = (_settingsPollCounter + 1) % 5; // adjust 10 => poll interval
+        if (_settingsPollCounter == 0) {
+            loadColorTheme();
+            loadGoalSettings();
+        }
         // Clear screen with black background
         dc.setColor(_black, _black);
         dc.clear();
