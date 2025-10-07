@@ -36,4 +36,12 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.SideGauges" title="@Strings.SideGaugesTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SideGaugesDisabled</listEntry>
+            <listEntry value="1">@Strings.SideGaugesEnabled</listEntry>
+        </settingConfig>
+    </setting>
+
+    
 </settings>

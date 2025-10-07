@@ -36,6 +36,7 @@ class RetroDigitalView extends WatchUi.WatchFace {
     private var _radius;
 
     private var _settingsPollCounter;
+    private var _sideGaugesEnabled;
 
         // New variable for cascade effect toggle
     private var _cascadeEnabled;
@@ -100,6 +101,7 @@ function loadGoalSettings() as Void {
             }
             if (_distanceUnit == null) { _distanceUnit = 0; }
         }
+    
     }
 
     // Cascade effect flag (normalize to list index: 0 = enabled, 1 = disabled)
@@ -115,9 +117,22 @@ function loadGoalSettings() as Void {
             if (_cascadeEnabled == null) { _cascadeEnabled = 0; }
         }
     }
+
+    // Side gauges flag (normalize to list index: 0 = disabled, 1 = enabled)
+    _sideGaugesEnabled = 0;
+    v = Application.Properties.getValue("SideGauges");
+    if (v != null) {
+        if (v == true || v == false) {
+            _sideGaugesEnabled = v ? 1 : 0;
+        } else {
+            try { _sideGaugesEnabled = v.toNumber(); } catch (e) {
+                try { _sideGaugesEnabled = v.toString().toNumber(); } catch (e2) { _sideGaugesEnabled = 0; }
+            }
+            if (_sideGaugesEnabled == null) { _sideGaugesEnabled = 0; }
+        }
+    }
+
 }
-
-
 
     // Load color theme based on user settings
        function loadColorTheme() as Void {
@@ -274,7 +289,13 @@ function loadGoalSettings() as Void {
         if (_isAwake && _cascadeEnabled  == 0) {
             drawMatrixRain(dc);  // Only draw rain when awake
         }
+
+        //Only draw gauges if enabled
+        if (_sideGaugesEnabled == 1){
         drawCurvedGauges(dc);     // Draw the new curved gauges
+        }
+        
+        
         drawDigitalTime(dc);
         drawStatusBars(dc);
         drawDataElements(dc);

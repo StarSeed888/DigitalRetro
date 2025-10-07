@@ -12,7 +12,6 @@
     <string id="RetroPink">Retro Pink</string>
     <string id="RetroYellow">Retro Yellow</string>
     <string id="RetroWhite">Retro White</string>
-    
     <string id="CalorieGoalTitle">Daily Calorie Goal</string>
     <string id="DistanceGoalTitle">Daily Distance Goal</string>
     <string id="DistanceUnitTitle">Distance Unit</string>
@@ -21,4 +20,7 @@
     <string id="CascadeEffectTitle">Matrix Rain Effect</string>
     <string id="CascadeEnabled">Enabled</string>
     <string id="CascadeDisabled">Disabled</string>
+    <string id="SideGaugesTitle">Side Gauges</string>
++   <string id="SideGaugesEnabled">Enabled</string>
++   <string id="SideGaugesDisabled">Disabled</string>
 </strings>
